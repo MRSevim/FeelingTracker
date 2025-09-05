@@ -1,15 +1,22 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, JetBrains_Mono, Source_Serif_4 } from "next/font/google";
 import "./globals.css";
+import ClientWrapper from "@/lib/ClientWrapper";
+import Header from "@/components/Header/Header";
 
 const geistSans = Geist({
-  variable: "--font-geist-sans",
+  variable: "--font-sans",
   subsets: ["latin"],
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const sourceSerif4 = Source_Serif_4({
   subsets: ["latin"],
+  variable: "--font-serif",
+});
+
+const jetBrainsMono = JetBrains_Mono({
+  subsets: ["latin"],
+  variable: "--font-mono",
 });
 
 export const metadata: Metadata = {
@@ -25,9 +32,11 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${sourceSerif4.variable} ${jetBrainsMono.variable} 
+        antialiased flex flex-col min-h-screen`}
       >
-        {children}
+        <Header />
+        <ClientWrapper>{children}</ClientWrapper>
       </body>
     </html>
   );
