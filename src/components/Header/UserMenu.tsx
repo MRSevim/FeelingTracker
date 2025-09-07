@@ -14,10 +14,12 @@ import {
 } from "@/components/shadcn/avatar";
 import Link from "next/link";
 import { auth, signOut } from "@/features/auth/lib/auth";
+import { routes } from "@/utils/config";
 
 const UserMenu = async () => {
   const session = await auth();
   const user = session?.user;
+
   return (
     <>
       {user ? (
@@ -28,19 +30,24 @@ const UserMenu = async () => {
               className="relative h-9 w-9 rounded-full p-0"
             >
               <Avatar className="h-9 w-9">
-                <AvatarImage src="/placeholder-user.jpg" alt="User" />
+                <AvatarImage src={user.image || ""} alt="User" />
                 <AvatarFallback>U</AvatarFallback>
                 <span className="sr-only">Profile image</span>
               </Avatar>
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-48">
-            <DropdownMenuLabel>My Account</DropdownMenuLabel>
+          <DropdownMenuContent align="end" className="w-48 text-center">
+            <DropdownMenuLabel>Welcome {user.name}</DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>Dashboard</DropdownMenuItem>
-            <DropdownMenuItem>Settings</DropdownMenuItem>
+            <DropdownMenuItem>
+              <Link href={routes.dashboard}>Dashboard</Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem>
+              {" "}
+              <Link href={routes.settings}>Settings </Link>
+            </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem className="text-red-600" asChild>
+            <DropdownMenuItem asChild>
               <Button
                 onClick={async () => {
                   "use server";

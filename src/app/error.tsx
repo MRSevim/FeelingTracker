@@ -25,8 +25,8 @@ export default function ErrorBoundary({
   }, [error]);
 
   return (
-    <Container>
-      <Card className="w-xs mt-20 text-center">
+    <Container className="mt-20">
+      <Card className="w-xs text-center">
         <CardHeader>
           <div className="flex justify-center mb-2">
             <AlertTriangle className="w-12 h-12 text-red-500" />

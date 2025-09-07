@@ -14,8 +14,8 @@ import Container from "@/components/Container";
 
 export default function NotFound() {
   return (
-    <Container>
-      <Card className="w-xs mt-20 text-center">
+    <Container className="mt-20">
+      <Card className="w-xs text-center">
         <CardHeader>
           <div className="flex justify-center mb-2">
             <XCircle className="w-12 h-12 text-gray-500" />
