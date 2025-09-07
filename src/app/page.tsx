@@ -1,13 +1,29 @@
+import Container from "@/components/Container";
 import GoogleSignIn from "@/features/auth/components/googleSignIn";
 import { auth } from "@/features/auth/lib/auth";
-import MoodSelector from "@/features/tracker/components/MoodSelector/MoodSelector";
+import MoodSelectorWrapper from "@/features/tracker/components/MoodSelector/MoodSelectorWrapper";
+import { routes } from "@/utils/config";
+import { redirect } from "next/navigation";
 
-export default async function Home() {
+export default async function Home({
+  searchParams,
+}: {
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+}) {
   const session = await auth();
   const user = session?.user;
+  const { edit } = await searchParams;
+  const editing = edit === "true";
+  if (!edit && user) {
+    redirect(routes.dashboard);
+  }
   return (
-    <div className="flex-1 flex flex-col justify-center mb-30 items-center">
-      {!user ? <GoogleSignIn /> : <MoodSelector />}
-    </div>
+    <Container className="flex-1 flex flex-col justify-center items-center">
+      {!user ? (
+        <GoogleSignIn />
+      ) : (
+        <MoodSelectorWrapper editing={editing && !!user} />
+      )}
+    </Container>
   );
 }

@@ -9,6 +9,7 @@ export default function GoogleSignIn() {
         "use server";
         await signIn("google");
       }}
+      className="mb-30"
     >
       <Button
         type="submit"

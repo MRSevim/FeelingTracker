@@ -32,8 +32,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${sourceSerif4.variable} ${jetBrainsMono.variable} 
-        antialiased flex flex-col min-h-screen`}
+        className={`${geistSans.variable} ${sourceSerif4.variable} ${jetBrainsMono.variable} antialiased flex flex-col min-h-screen`}
       >
         <Header />
         <ClientWrapper>{children}</ClientWrapper>
