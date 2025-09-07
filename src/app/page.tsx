@@ -1,7 +1,8 @@
 import Container from "@/components/Container";
 import GoogleSignIn from "@/features/auth/components/googleSignIn";
 import { auth } from "@/features/auth/lib/auth";
-import MoodSelectorWrapper from "@/features/tracker/components/MoodSelector/MoodSelectorWrapper";
+import MoodSelector from "@/features/tracker/components/MoodSelector/MoodSelector";
+import { getTodaysMood } from "@/features/tracker/lib/database";
 import { routes } from "@/utils/config";
 import { redirect } from "next/navigation";
 
@@ -13,17 +14,29 @@ export default async function Home({
   const session = await auth();
   const user = session?.user;
   const { edit } = await searchParams;
+  let editedEntry;
   const editing = edit === "true";
-  if (!edit && user) {
-    redirect(routes.dashboard);
+
+  if (user) {
+    const { entry, error } = await getTodaysMood();
+    if (entry && !editing) {
+      redirect(routes.dashboard);
+    }
+    if (editing) {
+      if (!entry || error) {
+        throw error || "Could not get today's mood";
+      }
+      editedEntry = {
+        valence: entry.valence,
+        arousal: entry.arousal,
+        note: entry.note || undefined,
+      };
+    }
   }
+
   return (
     <Container className="flex-1 flex flex-col justify-center items-center">
-      {!user ? (
-        <GoogleSignIn />
-      ) : (
-        <MoodSelectorWrapper editing={editing && !!user} />
-      )}
+      {!user ? <GoogleSignIn /> : <MoodSelector editedEntry={editedEntry} />}
     </Container>
   );
 }
