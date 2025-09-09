@@ -14,8 +14,11 @@ export default function SignInCard() {
         {/* Privacy Note */}
         <div className="flex items-center text-center text-sm text-muted-foreground gap-2">
           <Lock className="w-4 h-4" />
-          <span>Your mood data is private and secure. Only you can see it.</span>
+          <span>
+            Your mood data is private and secure. Only you can see it.
+          </span>
         </div>
       </CardContent>
     </Card>
   );
+}
