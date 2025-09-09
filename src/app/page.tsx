@@ -1,5 +1,5 @@
 import Container from "@/components/Container";
-import GoogleSignIn from "@/features/auth/components/googleSignIn";
+import SignIn from "@/features/auth/components/SignIn";
 import { auth } from "@/features/auth/lib/auth";
 import MoodSelector from "@/features/tracker/components/MoodSelector/MoodSelector";
 import { getTodaysMood } from "@/features/tracker/lib/database";
@@ -9,7 +9,7 @@ import { redirect } from "next/navigation";
 export default async function Home({
   searchParams,
 }: {
-  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+  searchParams: Promise<{ edit?: string }>;
 }) {
   const session = await auth();
   const user = session?.user;
@@ -36,7 +36,7 @@ export default async function Home({
 
   return (
     <Container className="flex-1 flex flex-col justify-center items-center">
-      {!user ? <GoogleSignIn /> : <MoodSelector editedEntry={editedEntry} />}
+      {!user ? <SignIn /> : <MoodSelector editedEntry={editedEntry} />}
     </Container>
   );
 }

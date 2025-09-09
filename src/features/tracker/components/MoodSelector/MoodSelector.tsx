@@ -18,17 +18,13 @@ import {
 import { Label } from "@/components/shadcn/label";
 import { addMood } from "../../lib/database";
 import { Spinner } from "@/components/shadcn/shadcn-io/spinner";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/shadcn/tooltip";
-import { getColor } from "../../utils/helpers";
 import { AddMood } from "../../utils/types";
+import { Tooltips } from "./ToolTips";
+import { Dot } from "./Dot";
 
 const range = 11; // -5 .. +5 (11 points)
 
-type Selected = { x: number; y: number } | null;
+export type Selected = { x: number; y: number } | null;
 
 export default function MoodSelector({
   editedEntry,
@@ -101,27 +97,8 @@ const SelectorGrid = memo(function Memoized({
     <>
       {/* 2D Selector */}
       <div className="flex flex-col items-center justify-center">
-        <div className="relative min-w-[200px] xs:min-w-[300px] sm:min-w-[350px] md:min-w-[400px] aspect-square border rounded-md bg-muted">
-          {/* Axis lines */}
-          <div className="absolute inset-0 pointer-events-none">
-            {/* Vertical line (valence = 0) */}
-            <div className="absolute left-1/2 -translate-x-1/2 top-0 bottom-0 w-[2px] bg-foreground/50" />
-            {/* Horizontal line (arousal = 0) */}
-            <div className="absolute top-1/2 -translate-y-1/2 left-0 right-0 h-[2px] bg-foreground/50" />
-          </div>
-          {/* Axis labels */}
-          <span className="absolute -top-6 left-1/2 -translate-x-1/2 text-sm">
-            High Arousal
-          </span>
-          <span className="absolute -bottom-6 left-1/2 -translate-x-1/2 text-sm">
-            Low Arousal
-          </span>
-          <span className="absolute top-1/2 -left-12 -translate-y-1/2 text-sm -rotate-90">
-            Unpleasant
-          </span>
-          <span className="absolute top-1/2 -right-10 -translate-y-1/2 text-sm rotate-90">
-            Pleasant
-          </span>
+        <div className="relative min-w-[225px] xs:min-w-[300px] sm:min-w-[350px] md:min-w-[400px] aspect-square border rounded-md bg-muted">
+          <Tooltips />
 
           {/* Grid */}
           <div className="grid grid-cols-11 grid-rows-11 w-full h-full">
@@ -130,37 +107,18 @@ const SelectorGrid = memo(function Memoized({
                 const x = col - 5; // -5..+5
                 const y = 5 - row; // invert so top is +5
                 const isSelected = selected?.x === x && selected?.y === y;
-                const color = getColor(x, y);
 
                 return (
                   <div
                     key={`${row}-${col}`}
                     className="flex items-center justify-center"
                   >
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <div
-                          onClick={() => {
-                            if (isSelected) {
-                              setSelected(null);
-                            } else setSelected({ x, y });
-                          }}
-                          className="w-1/5 h-1/5 rounded-full transition-transform cursor-pointer"
-                          style={{
-                            backgroundColor: isSelected
-                              ? "var(--color-primary)"
-                              : color,
-                            transform: isSelected ? "scale(1.5)" : "scale(1)",
-                          }}
-                        />
-                      </TooltipTrigger>
-
-                      {/* Hover coordinates tooltip */}
-                      <TooltipContent>
-                        {" "}
-                        ({x}, {y})
-                      </TooltipContent>
-                    </Tooltip>
+                    <Dot
+                      x={x}
+                      y={y}
+                      isSelected={isSelected}
+                      setSelected={setSelected}
+                    />
                   </div>
                 );
               })
