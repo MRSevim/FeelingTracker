@@ -58,6 +58,64 @@ export const getTodaysMood = async () => {
 
     return { entry, error: "" }; // null if not found
   } catch (error) {
-    return { entry: null, error: returnErrorFromUnknown(error) };
+    return { entry: null, ...returnErrorFromUnknown(error) };
+  }
+};
+
+/**
+ * Fetches mood entries for a given month
+ * @param targetDate - Any Date object in the month to fetch
+ */
+export const getMoodsByDate = async (targetDate?: Date) => {
+  try {
+    const user = await checkAuth();
+    const date = targetDate ?? new Date(); // default to today
+
+    const year = date.getFullYear();
+    const month = date.getMonth(); // 0-indexed: Jan = 0
+
+    const startOfMonth = new Date(year, month, 1);
+    const endOfMonth = new Date(year, month + 1, 0, 23, 59, 59, 999);
+
+    // fetch entries for that month
+    const entries = await prisma.moodEntry.findMany({
+      where: {
+        userId: user.id,
+        day: {
+          gte: startOfMonth,
+          lte: endOfMonth,
+        },
+      },
+      orderBy: {
+        day: "asc",
+      },
+    });
+
+    // scan all recorded months/years for frontend selection
+    const allEntries = await prisma.moodEntry.findMany({
+      where: { userId: user.id },
+      select: { day: true },
+    });
+
+    const availableTimes = Array.from(
+      new Set(
+        allEntries.map((e) => `${e.day.getFullYear()}-${e.day.getMonth()}`)
+      )
+    ).map((s) => {
+      const [y, m] = s.split("-").map(Number);
+      return { year: y, month: m };
+    });
+
+    return {
+      data: {
+        entries,
+        availableTimes,
+        month,
+        year,
+      },
+      error: "",
+    };
+  } catch (error) {
+    return { data: null, ...returnErrorFromUnknown(error) };
   }
 };

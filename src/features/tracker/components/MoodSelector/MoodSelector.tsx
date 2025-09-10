@@ -21,6 +21,7 @@ import { Spinner } from "@/components/shadcn/shadcn-io/spinner";
 import { AddMood } from "../../utils/types";
 import { Tooltips } from "./ToolTips";
 import { Dot } from "./Dot";
+import ErrorMessage from "@/components/ErrorMessage";
 
 const range = 11; // -5 .. +5 (11 points)
 
@@ -67,9 +68,7 @@ export default function MoodSelector({
           </div>
 
           {/* Error message */}
-          {error && (
-            <div className="text-red-500 text-sm font-medium">{error}</div>
-          )}
+          {error && <ErrorMessage error={error} />}
 
           {/* Submit */}
           <Button
