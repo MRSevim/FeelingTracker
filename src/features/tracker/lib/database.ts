@@ -62,17 +62,19 @@ export const getTodaysMood = async () => {
   }
 };
 
-/**
- * Fetches mood entries for a given month
- * @param targetDate - Any Date object in the month to fetch
- */
-export const getMoodsByDate = async (targetDate?: Date) => {
+export const getMoodsByDate = async (param: {
+  year?: number;
+  month?: number;
+}) => {
   try {
     const user = await checkAuth();
-    const date = targetDate ?? new Date(); // default to today
+    const today = new Date(); // default to today
 
-    const year = date.getFullYear();
-    const month = date.getMonth(); // 0-indexed: Jan = 0
+    const year = param?.year || today.getFullYear();
+    const month =
+      param?.month !== undefined && !isNaN(param?.month)
+        ? param.month
+        : today.getMonth(); // 0-indexed: Jan = 0
 
     const startOfMonth = new Date(year, month, 1);
     const endOfMonth = new Date(year, month + 1, 0, 23, 59, 59, 999);

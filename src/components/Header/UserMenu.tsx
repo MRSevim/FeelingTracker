@@ -39,11 +39,10 @@ const UserMenu = async () => {
           <DropdownMenuContent align="end" className="w-48 text-center">
             <DropdownMenuLabel>Welcome {user.name}</DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>
+            <DropdownMenuItem asChild>
               <Link href={routes.dashboard}>Dashboard</Link>
             </DropdownMenuItem>
-            <DropdownMenuItem>
-              {" "}
+            <DropdownMenuItem asChild>
               <Link href={routes.settings}>Settings </Link>
             </DropdownMenuItem>
             <DropdownMenuSeparator />

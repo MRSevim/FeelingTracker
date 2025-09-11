@@ -3,16 +3,15 @@ import TodaysEntry, {
   TodaysEntrySkeleton,
   TodaysEntryWrapper,
 } from "./TodaysEntry";
-import Calendar, { CalendarSkeleton, CalendarWrapper } from "./Calendar";
+import Calendar, { CalendarSkeleton } from "./Calendar";
+import { DashboardSearchParams } from "../../utils/types";
 
-export default function Dashboard() {
+export default function Dashboard({ searchParams }: DashboardSearchParams) {
   return (
     <div className="space-y-8 flex-1 mt-20">
-      <CalendarWrapper>
-        <Suspense fallback={<CalendarSkeleton />}>
-          <Calendar />
-        </Suspense>
-      </CalendarWrapper>
+      <Suspense fallback={<CalendarSkeleton />}>
+        <Calendar searchParams={searchParams} />
+      </Suspense>
 
       <TodaysEntryWrapper>
         <Suspense fallback={<TodaysEntrySkeleton />}>
