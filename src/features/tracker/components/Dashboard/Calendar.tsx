@@ -90,7 +90,7 @@ const Calendar = async ({ searchParams }: DashboardSearchParams) => {
                 </TooltipTrigger>
                 <TooltipContent>
                   <p className="text-sm font-medium">
-                    {day.day.toLocaleDateString()}
+                    {day.day.toLocaleDateString("en-GB")}
                   </p>
                   {day.entry ? (
                     <p className="text-xs text-muted mt-1">

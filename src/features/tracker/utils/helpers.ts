@@ -1,7 +1,9 @@
 //helper to get todays date normalized to midnight
 export function getToday(): Date {
   const now = new Date();
-  return new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  return new Date(
+    Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate())
+  );
 }
 
 // helper to get color based on x,y

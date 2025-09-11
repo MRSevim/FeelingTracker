@@ -56,7 +56,7 @@ export const getTodaysMood = async () => {
       },
     });
 
-    return { entry, error: "" }; // null if not found
+    return { entry, error: "" };
   } catch (error) {
     return { entry: null, ...returnErrorFromUnknown(error) };
   }
