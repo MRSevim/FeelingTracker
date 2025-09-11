@@ -9,49 +9,16 @@ import {
   SelectValue,
 } from "@/components/shadcn/select";
 import { Skeleton } from "@/components/shadcn/skeleton";
-import { Search } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
-import { FormEvent, useEffect, useState } from "react";
-
-type AvailableTimes = {
-  year: number;
-  month: number;
-}[];
-
-type DatePickerProps = {
-  data: {
-    availableTimes: AvailableTimes;
-    month: number;
-    year: number;
-  };
-};
-
-const getAvailableYears = (availableTimes: AvailableTimes) => {
-  return Array.from(new Set(availableTimes.map((t) => t.year))).sort(
-    (a, b) => b - a // newest first
-  );
-};
-
-const getAvailableMonthsByYear = (
-  availableTimes: AvailableTimes,
-  year: number
-) => {
-  const months = availableTimes
-    .filter((t) => t.year === year) // only entries for the selected year
-    .map((t) => t.month);
-  const uniqueMonths = Array.from(new Set(months)); // remove duplicates
-  const sortedMonths = uniqueMonths.sort((a, b) => a - b); // Jan..Dec order
-
-  // convert to nice month names using the actual year
-  const convertedMonths = sortedMonths.map((m) => {
-    return {
-      string: new Date(year, m).toLocaleString("default", { month: "long" }),
-      monthNumber: m,
-    };
-  });
-
-  return convertedMonths;
-};
+import { useEffect, useMemo, useState } from "react";
+import {
+  callReplace,
+  DatePickerProps,
+  getAvailableMonthsByYear,
+  getAvailableYears,
+  sortAndGetCurrentIndex,
+} from "../../utils/DatePicker-utils";
 
 function DatePicker({ data }: DatePickerProps) {
   const pathname = usePathname();
@@ -64,86 +31,142 @@ function DatePicker({ data }: DatePickerProps) {
   );
 
   useEffect(() => {
+    //to sync the local state with incoming data
     setMonth(data.month);
     setYear(data.year);
     setYears(getAvailableYears(data.availableTimes));
   }, [data]);
 
   useEffect(() => {
-    //Sets the available months
+    /* Sets the available months when year changes, logic is in useEffect because year can change from
+    both back and forward buttons and year selection*/
     setMonths(getAvailableMonthsByYear(data.availableTimes, year));
   }, [data, year]);
 
-  useEffect(() => {
-    //Selects the first available month when year changes if current selected month is not available
-    const newMonths = getAvailableMonthsByYear(data.availableTimes, year);
+  const handlePrevMonth = () => {
+    const { allTimes, currentIndex } = sortAndGetCurrentIndex(
+      data.availableTimes,
+      { year, month }
+    );
 
-    if (!newMonths.find((m) => m.monthNumber === month)) {
-      setMonth(newMonths[0].monthNumber);
+    if (currentIndex > 0) {
+      const prev = allTimes[currentIndex - 1];
+      setYear(prev.year);
+      setMonth(prev.month);
+      callReplace(replace, pathname, { year: prev.year, month: prev.month });
     }
-  }, [data, year, month]);
-
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    replace(`${pathname}?month=${month.toString()}&year=${year.toString()}`);
   };
 
+  const handleNextMonth = () => {
+    const { allTimes, currentIndex } = sortAndGetCurrentIndex(
+      data.availableTimes,
+      { year, month }
+    );
+
+    if (currentIndex < allTimes.length - 1) {
+      const next = allTimes[currentIndex + 1];
+      setYear(next.year);
+      setMonth(next.month);
+      callReplace(replace, pathname, { year: next.year, month: next.month });
+    }
+  };
+
+  const { allTimes: allTimesSorted, currentIndex } = useMemo(
+    () => sortAndGetCurrentIndex(data.availableTimes, { year, month }),
+    [data.availableTimes, year, month]
+  );
+
   return (
-    <form onSubmit={handleSubmit} className="flex gap-2">
-      {/* Month Picker */}
-      <Select
-        value={month.toString()}
-        onValueChange={(month) => setMonth(Number(month))}
-      >
-        <SelectTrigger>
-          <SelectValue placeholder="Month" />
-        </SelectTrigger>
-        <SelectContent>
-          {months.map((m) => (
-            <SelectItem key={m.monthNumber} value={String(m.monthNumber)}>
-              {m.string}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
+    <div className="flex gap-2 flex-col">
+      <div className="flex gap-2 items-center justify-center">
+        {/* Prev Button */}
+        <Button
+          variant="outline"
+          size="icon"
+          onClick={handlePrevMonth}
+          disabled={currentIndex <= 0}
+        >
+          <ChevronLeft className="h-4 w-4" />
+        </Button>
+        {/* Next Button */}
+        <Button
+          variant="outline"
+          size="icon"
+          onClick={handleNextMonth}
+          disabled={currentIndex >= allTimesSorted.length - 1}
+        >
+          <ChevronRight className="h-4 w-4" />
+        </Button>
+      </div>
+      <div className="flex gap-2 items-center justify-center">
+        {/* Month Picker */}
+        <Select
+          value={month.toString()}
+          onValueChange={(month) => {
+            const monthNumber = Number(month);
+            setMonth(monthNumber);
+            callReplace(replace, pathname, { year, month: monthNumber });
+          }}
+        >
+          <SelectTrigger>
+            <SelectValue placeholder="Month" />
+          </SelectTrigger>
+          <SelectContent>
+            {months.map((m) => (
+              <SelectItem key={m.monthNumber} value={String(m.monthNumber)}>
+                {m.string}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
 
-      {/* Year Picker */}
-      <Select
-        value={year.toString()}
-        onValueChange={(year) => setYear(Number(year))}
-      >
-        <SelectTrigger>
-          <SelectValue placeholder="Year" />
-        </SelectTrigger>
-        <SelectContent>
-          {years.map((y) => (
-            <SelectItem key={y} value={String(y)}>
-              {y}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
+        {/* Year Picker */}
+        <Select
+          value={year.toString()}
+          onValueChange={(year) => {
+            const yearNumber = Number(year);
+            setYear(yearNumber);
 
-      {/* Submit button with search icon */}
-      <Button variant="outline" size="icon">
-        <Search className="h-4 w-4" />
-        <span className="sr-only">Search icon</span>
-      </Button>
-    </form>
+            /* Selects the first available month when year changes */
+            const newMonths = getAvailableMonthsByYear(
+              data.availableTimes,
+              yearNumber
+            );
+
+            setMonth(newMonths[0].monthNumber);
+            return callReplace(replace, pathname, {
+              year: yearNumber,
+              month: newMonths[0].monthNumber,
+            });
+          }}
+        >
+          <SelectTrigger>
+            <SelectValue placeholder="Year" />
+          </SelectTrigger>
+          <SelectContent>
+            {years.map((y) => (
+              <SelectItem key={y} value={String(y)}>
+                {y}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+    </div>
   );
 }
 
 export function DatePickerSkeleton() {
   return (
-    <div className="flex gap-2">
-      {/* Month Picker Skeleton */}
-      <Skeleton className="h-8 w-[85px] rounded-md" />
-
-      {/* Year Picker Skeleton */}
-      <Skeleton className="h-8 w-[85px] rounded-md" />
-
-      {/* Search Button Skeleton */}
-      <Skeleton className="h-8 w-10 rounded-md" />
+    <div className="flex gap-2 flex-col">
+      <div className="flex gap-2 items-center justify-center">
+        <Skeleton className="h-8 w-10 rounded-md" /> {/* Prev */}
+        <Skeleton className="h-8 w-10 rounded-md" /> {/* Next */}
+      </div>
+      <div className="flex gap-2 items-center justify-center">
+        <Skeleton className="h-8 w-[85px] rounded-md" /> {/* Month */}
+        <Skeleton className="h-8 w-[85px] rounded-md" /> {/* Year */}
+      </div>
     </div>
   );
 }
