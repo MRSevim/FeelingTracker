@@ -1,8 +1,17 @@
-//helper to get todays date normalized to midnight
-export function getToday(): Date {
-  const now = new Date();
+//helper to get  utc, prisma needs utc dates
+export function getUTC(date?: Date): Date {
+  const now = date || new Date();
+  // Construct a new Date using UTC components
   return new Date(
-    Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate())
+    Date.UTC(
+      now.getUTCFullYear(),
+      now.getUTCMonth(),
+      now.getUTCDate(),
+      now.getUTCHours(),
+      now.getUTCMinutes(),
+      now.getUTCSeconds(),
+      now.getUTCMilliseconds()
+    )
   );
 }
 

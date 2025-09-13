@@ -4,14 +4,14 @@ import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import { checkAuth, returnErrorFromUnknown } from "@/utils/helpers";
 import { AddMood } from "../utils/types";
-import { getToday } from "../utils/helpers";
+import { getUTC } from "../utils/helpers";
 import { routes } from "@/utils/config";
 
 export const addMood = async (entry: AddMood) => {
   try {
     const user = await checkAuth();
 
-    const today = getToday();
+    const today = getUTC();
     const valence = entry.valence;
     const arousal = entry.arousal;
     const note = entry.note;
@@ -45,14 +45,22 @@ export const addMood = async (entry: AddMood) => {
 export const getTodaysMood = async () => {
   try {
     const user = await checkAuth();
-    const today = getToday();
 
-    const entry = await prisma.moodEntry.findUnique({
+    const gte = getUTC();
+    const lte = getUTC();
+    lte.setUTCHours(23, 59, 59, 999);
+    gte.setUTCHours(0, 0, 0, 0);
+
+    const entry = await prisma.moodEntry.findFirst({
       where: {
-        userId_day: {
-          userId: user.id,
-          day: today,
+        userId: user.id,
+        day: {
+          gte,
+          lte,
         },
+      },
+      orderBy: {
+        day: "asc",
       },
     });
 
@@ -62,30 +70,33 @@ export const getTodaysMood = async () => {
   }
 };
 
-export const getMoodsByDate = async (param: {
+export const getMoodsByMonth = async (param: {
   year?: number;
   month?: number;
 }) => {
   try {
     const user = await checkAuth();
-    const today = new Date(); // default to today
+    const now = new Date();
 
-    const year = param?.year || today.getFullYear();
+    const year = param?.year || now.getFullYear();
     const month =
       param?.month !== undefined && !isNaN(param?.month)
         ? param.month
-        : today.getMonth(); // 0-indexed: Jan = 0
+        : now.getMonth(); // 0-indexed: Jan = 0
 
-    const startOfMonth = new Date(year, month, 1);
+    const startOfMonth = new Date(year, month, 1, 0, 0, 0, 0);
     const endOfMonth = new Date(year, month + 1, 0, 23, 59, 59, 999);
+
+    const gte = getUTC(startOfMonth);
+    const lte = getUTC(endOfMonth);
 
     // fetch entries for that month
     const entries = await prisma.moodEntry.findMany({
       where: {
         userId: user.id,
         day: {
-          gte: startOfMonth,
-          lte: endOfMonth,
+          gte,
+          lte,
         },
       },
       orderBy: {
@@ -99,11 +110,18 @@ export const getMoodsByDate = async (param: {
       select: { day: true },
     });
 
-    const availableTimes = Array.from(
-      new Set(
-        allEntries.map((e) => `${e.day.getFullYear()}-${e.day.getMonth()}`)
-      )
-    ).map((s) => {
+    // create a Set of unique "year-month" strings
+    const availableTimesSet = new Set(
+      allEntries.map((e) => {
+        const date = new Date(e.day.getTime());
+        return `${date.getFullYear()}-${date.getMonth()}`;
+      })
+    );
+
+    // add current month/year to the Set
+    availableTimesSet.add(`${now.getFullYear()}-${now.getMonth()}`);
+
+    const availableTimes = Array.from(availableTimesSet).map((s) => {
       const [y, m] = s.split("-").map(Number);
       return { year: y, month: m };
     });

@@ -87,6 +87,7 @@ function DatePicker({ data }: DatePickerProps) {
           disabled={currentIndex <= 0}
         >
           <ChevronLeft className="h-4 w-4" />
+          <span className="sr-only">Go back a month</span>
         </Button>
         {/* Next Button */}
         <Button
@@ -96,6 +97,7 @@ function DatePicker({ data }: DatePickerProps) {
           disabled={currentIndex >= allTimesSorted.length - 1}
         >
           <ChevronRight className="h-4 w-4" />
+          <span className="sr-only">Go forward a month</span>
         </Button>
       </div>
       <div className="flex gap-2 items-center justify-center">

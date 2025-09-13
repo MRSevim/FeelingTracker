@@ -14,17 +14,28 @@ import {
 import { CalendarDays } from "lucide-react";
 import { getColor } from "../../utils/helpers";
 import { Skeleton } from "@/components/shadcn/skeleton";
-import { getMoodsByDate } from "../../lib/database";
+import { getMoodsByMonth } from "../../lib/database";
 import ErrorMessage from "@/components/ErrorMessage";
 import DatePicker, { DatePickerSkeleton } from "./DatePicker";
 import { DashboardSearchParams } from "../../utils/types";
+import { headers } from "next/headers";
+
+async function getUserLocale(): Promise<string | undefined> {
+  const h = await headers();
+  const acceptLanguage = h.get("accept-language"); // e.g. "en-US,en;q=0.9,fr;q=0.8"
+  if (!acceptLanguage) return undefined;
+
+  // get the first language
+  const primaryLocale = acceptLanguage.split(",")[0];
+  return primaryLocale;
+}
 
 const Calendar = async ({ searchParams }: DashboardSearchParams) => {
   const params = await searchParams;
   const year = Number(params?.year);
   const month = Number(params?.month);
 
-  const { data, error } = await getMoodsByDate({ year, month });
+  const { data, error } = await getMoodsByMonth({ year, month });
 
   if (!data || error) {
     return <ErrorMessage error={error || "Could not fetch the calendar"} />;
@@ -57,6 +68,8 @@ const Calendar = async ({ searchParams }: DashboardSearchParams) => {
     };
   });
 
+  const locale = await getUserLocale();
+
   return (
     <Card>
       <CardHeader className="flex items-center gap-2 flex flex-col">
@@ -88,9 +101,9 @@ const Calendar = async ({ searchParams }: DashboardSearchParams) => {
                     }}
                   />
                 </TooltipTrigger>
-                <TooltipContent>
+                <TooltipContent className="text-wrap text-center max-w-[200px]">
                   <p className="text-sm font-medium">
-                    {day.day.toLocaleDateString("en-GB")}
+                    {day.day.toLocaleDateString(locale)}
                   </p>
                   {day.entry ? (
                     <p className="text-xs text-muted mt-1">
