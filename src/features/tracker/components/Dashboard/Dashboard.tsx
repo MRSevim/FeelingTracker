@@ -5,6 +5,7 @@ import TodaysEntry, {
 } from "./TodaysEntry";
 import Calendar, { CalendarSkeleton } from "./Calendar";
 import { DashboardSearchParams } from "../../utils/types";
+import LineChartsWrapper from "./Charts/LineChartsWrapper";
 
 export default function Dashboard({ searchParams }: DashboardSearchParams) {
   return (
@@ -18,6 +19,10 @@ export default function Dashboard({ searchParams }: DashboardSearchParams) {
           <TodaysEntry />
         </Suspense>
       </TodaysEntryWrapper>
+
+      <Suspense fallback={"Loading..."}>
+        <LineChartsWrapper />
+      </Suspense>
     </div>
   );
 }

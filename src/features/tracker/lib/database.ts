@@ -7,6 +7,7 @@ import { AddMood } from "../utils/types";
 import { getUTC } from "../utils/helpers";
 import { routes } from "@/utils/config";
 
+//adds mood with current date converted to utc
 export const addMood = async (entry: AddMood) => {
   try {
     const user = await checkAuth();
@@ -42,6 +43,7 @@ export const addMood = async (entry: AddMood) => {
   redirect(routes.dashboard);
 };
 
+//gets the mood of today by scanning between starting and end of the today
 export const getTodaysMood = async () => {
   try {
     const user = await checkAuth();
@@ -70,6 +72,7 @@ export const getTodaysMood = async () => {
   }
 };
 
+//gets the mood entries of certain month+year or this month if param is not there
 export const getMoodsByMonth = async (param: {
   year?: number;
   month?: number;
@@ -137,5 +140,53 @@ export const getMoodsByMonth = async (param: {
     };
   } catch (error) {
     return { data: null, ...returnErrorFromUnknown(error) };
+  }
+};
+
+//Gets the mood entries between now and specified days ago
+export const getMoodEntriesByDaysAgo = async (daysAgo: number = 7) => {
+  try {
+    const user = await checkAuth();
+    const now = new Date();
+
+    const startDate = new Date();
+    startDate.setDate(now.getDate() - (daysAgo - 1)); // inclusive
+
+    const gte = getUTC(startDate);
+    const lte = getUTC(now);
+
+    const entries = await prisma.moodEntry.findMany({
+      where: {
+        userId: user.id,
+        day: {
+          gte,
+          lte,
+        },
+      },
+      orderBy: { day: "asc" },
+    });
+
+    // map entries to a dictionary for quick lookup
+    const entryMap = new Map(
+      entries.map((e) => [
+        new Date(e.day).toISOString().slice(0, 10), // 'YYYY-MM-DD'
+        { valence: e.valence, arousal: e.arousal, note: e.note } as AddMood,
+      ])
+    );
+
+    // generate full day array
+    const chartData = Array.from({ length: daysAgo }, (_, i) => {
+      const d = new Date(startDate);
+      d.setDate(startDate.getDate() + i);
+      const dayKey = new Date(d).toISOString().slice(0, 10);
+
+      return {
+        name: dayKey, // can format differently if you want
+        value: entryMap.get(dayKey) ?? undefined,
+      };
+    });
+    return { data: chartData, error: "" };
+  } catch (error) {
+    return { data: [], ...returnErrorFromUnknown(error) };
   }
 };
