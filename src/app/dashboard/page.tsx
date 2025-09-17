@@ -4,7 +4,7 @@ import { DashboardSearchParams } from "@/features/tracker/utils/types";
 
 export default function Page({ searchParams }: DashboardSearchParams) {
   return (
-    <Container className="flex-1 flex flex-col justify-center items-center">
+    <Container className="flex-1 flex flex-col justify-center items-center w-full">
       <Dashboard searchParams={searchParams} />
     </Container>
   );

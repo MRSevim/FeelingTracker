@@ -1,3 +1,5 @@
+import { ReadonlyHeaders } from "next/dist/server/web/spec-extension/adapters/headers";
+
 //helper to get  utc, prisma needs utc dates
 export function getUTC(date?: Date): Date {
   const now = date || new Date();
@@ -27,3 +29,15 @@ export const getColor = (x: number, y: number) => {
 
   return `rgb(${r}, ${g}, ${b})`;
 };
+
+export async function getUserLocale(
+  headers: () => Promise<ReadonlyHeaders>
+): Promise<string | undefined> {
+  const h = await headers();
+  const acceptLanguage = h.get("accept-language"); // e.g. "en-US,en;q=0.9,fr;q=0.8"
+  if (!acceptLanguage) return undefined;
+
+  // get the first language
+  const primaryLocale = acceptLanguage.split(",")[0];
+  return primaryLocale;
+}

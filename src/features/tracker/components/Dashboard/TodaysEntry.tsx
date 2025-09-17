@@ -75,7 +75,7 @@ export const TodaysEntryWrapper = ({
   children: React.ReactNode;
 }) => {
   return (
-    <Card>
+    <Card className="w-full">
       <CardHeader>
         <CardTitle>Today’s Mood</CardTitle>
       </CardHeader>

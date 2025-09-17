@@ -12,23 +12,13 @@ import {
   TooltipTrigger,
 } from "@/components/shadcn/tooltip";
 import { CalendarDays } from "lucide-react";
-import { getColor } from "../../utils/helpers";
+import { getColor, getUserLocale } from "../../utils/helpers";
 import { Skeleton } from "@/components/shadcn/skeleton";
 import { getMoodsByMonth } from "../../lib/database";
 import ErrorMessage from "@/components/ErrorMessage";
 import DatePicker, { DatePickerSkeleton } from "./DatePicker";
 import { DashboardSearchParams } from "../../utils/types";
 import { headers } from "next/headers";
-
-async function getUserLocale(): Promise<string | undefined> {
-  const h = await headers();
-  const acceptLanguage = h.get("accept-language"); // e.g. "en-US,en;q=0.9,fr;q=0.8"
-  if (!acceptLanguage) return undefined;
-
-  // get the first language
-  const primaryLocale = acceptLanguage.split(",")[0];
-  return primaryLocale;
-}
 
 const Calendar = async ({ searchParams }: DashboardSearchParams) => {
   const params = await searchParams;
@@ -68,10 +58,10 @@ const Calendar = async ({ searchParams }: DashboardSearchParams) => {
     };
   });
 
-  const locale = await getUserLocale();
+  const locale = await getUserLocale(headers);
 
   return (
-    <Card>
+    <Card className="w-full">
       <CardHeader className="flex items-center gap-2 flex flex-col">
         <CalendarDays className="h-5 w-5 text-muted-foreground" />
         <CardTitle>Mood Calendar</CardTitle>
@@ -126,7 +116,7 @@ const Calendar = async ({ searchParams }: DashboardSearchParams) => {
 
 export const CalendarSkeleton = () => {
   return (
-    <Card>
+    <Card className="w-full">
       <CardHeader className="flex items-center gap-2 flex flex-col">
         <CalendarDays className="h-5 w-5 text-muted-foreground" />
         <CardTitle>Mood Calendar</CardTitle>

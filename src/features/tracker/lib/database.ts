@@ -144,13 +144,13 @@ export const getMoodsByMonth = async (param: {
 };
 
 //Gets the mood entries between now and specified days ago
-export const getMoodEntriesByDaysAgo = async (daysAgo: number = 7) => {
+export const getMoodEntriesByDays = async (days: number) => {
   try {
     const user = await checkAuth();
     const now = new Date();
 
     const startDate = new Date();
-    startDate.setDate(now.getDate() - (daysAgo - 1)); // inclusive
+    startDate.setDate(now.getDate() - (days - 1)); // inclusive
 
     const gte = getUTC(startDate);
     const lte = getUTC(now);
@@ -169,24 +169,27 @@ export const getMoodEntriesByDaysAgo = async (daysAgo: number = 7) => {
     // map entries to a dictionary for quick lookup
     const entryMap = new Map(
       entries.map((e) => [
-        new Date(e.day).toISOString().slice(0, 10), // 'YYYY-MM-DD'
-        { valence: e.valence, arousal: e.arousal, note: e.note } as AddMood,
+        getIsoDate(e.day), //
+        { valence: e.valence, arousal: e.arousal },
       ])
     );
 
     // generate full day array
-    const chartData = Array.from({ length: daysAgo }, (_, i) => {
+    const chartData = Array.from({ length: days }, (_, i) => {
       const d = new Date(startDate);
       d.setDate(startDate.getDate() + i);
-      const dayKey = new Date(d).toISOString().slice(0, 10);
+      const day = getIsoDate(d);
 
       return {
-        name: dayKey, // can format differently if you want
-        value: entryMap.get(dayKey) ?? undefined,
+        day: d,
+        ...entryMap.get(day),
       };
     });
+
     return { data: chartData, error: "" };
   } catch (error) {
     return { data: [], ...returnErrorFromUnknown(error) };
   }
 };
+
+const getIsoDate = (date: Date) => new Date(date).toISOString().slice(0, 10); //"YYYY-MM-DD";
