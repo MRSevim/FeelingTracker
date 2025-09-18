@@ -29,7 +29,7 @@ export const Tooltips = memo(function Memoized() {
       <span className="absolute top-0 left-0 -translate-y-full -translate-x-1/2 translate text-xs xs:text-sm sm:text-base text-muted-foreground pointer-events-none select-none leading-tight text-left rotate-[-15deg]">
         Anxious
         <br />
-        Nervous
+        Angry
       </span>
       <span className="absolute top-0 right-0 -translate-y-full translate-x-1/2  text-xs xs:text-sm sm:text-base text-muted-foreground pointer-events-none select-none leading-tight text-right rotate-[15deg]">
         Excited

@@ -38,12 +38,19 @@ export default function MoodSelector({
   const [note, setNote] = useState(editedEntry?.note || "");
   const [error, action, isPending] = useActionState(async () => {
     if (!selected) return "Please select your mood before submitting";
+    const now = new Date(); //need date info for locality
 
-    const { error } = await addMood({
-      valence: selected?.x,
-      arousal: selected?.y,
-      note,
-    });
+    const { error } = await addMood(
+      {
+        valence: selected?.x,
+        arousal: selected?.y,
+        note,
+      },
+      {
+        timestamp: now.getTime(), // milliseconds since epoch
+        timezoneOffset: now.getTimezoneOffset(), // in minutes behind UTC
+      }
+    );
     return error;
   }, "");
 
@@ -77,7 +84,7 @@ export default function MoodSelector({
             disabled={isPending}
           >
             {isPending && <Spinner />}
-            {isPending ? "Saving..." : editedEntry ? "Edit Mood" : "Save Mood"}
+            {isPending ? "Saving..." : "Save Mood"}
           </Button>
         </CardContent>
       </Card>

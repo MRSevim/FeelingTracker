@@ -3,40 +3,61 @@
 import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import { checkAuth, returnErrorFromUnknown } from "@/utils/helpers";
-import { AddMood } from "../utils/types";
-import { getUTC } from "../utils/helpers";
+import { AddMood, TimezoneInfo } from "../utils/types";
+import { getIsoDate, getStartAndEndOfDay, getUTC } from "../utils/helpers";
 import { routes } from "@/utils/config";
 
 //adds mood with current date converted to utc
-export const addMood = async (entry: AddMood) => {
+export const addMood = async (entry: AddMood, timezoneInfo: TimezoneInfo) => {
   try {
     const user = await checkAuth();
 
-    const today = getUTC();
     const valence = entry.valence;
     const arousal = entry.arousal;
     const note = entry.note;
 
-    await prisma.moodEntry.upsert({
+    if (
+      !Number.isInteger(valence) ||
+      !Number.isInteger(arousal) ||
+      Math.abs(valence) > 5 ||
+      Math.abs(arousal) > 5
+    )
+      throw Error("Valence and arousal must be whole numbers between -5 and 5");
+
+    const { gte, lte } = getStartAndEndOfDay(timezoneInfo);
+
+    const existing = await prisma.moodEntry.findFirst({
       where: {
-        userId_day: {
-          userId: user.id,
-          day: today,
+        userId: user.id,
+        day: {
+          gte,
+          lte,
         },
       },
-      update: {
-        valence,
-        arousal,
-        note,
-      },
-      create: {
-        userId: user.id,
-        day: today,
-        valence,
-        arousal,
-        note,
-      },
     });
+
+    if (existing) {
+      // overwrite existing mood for today
+      await prisma.moodEntry.update({
+        where: { id: existing.id },
+        data: {
+          valence,
+          arousal,
+          note,
+        },
+      });
+    } else {
+      // create new mood entry
+      await prisma.moodEntry.create({
+        data: {
+          userId: user.id,
+          day: new Date(),
+          valence,
+          arousal,
+          note,
+        },
+      });
+    }
   } catch (error) {
     return returnErrorFromUnknown(error);
   }
@@ -191,5 +212,3 @@ export const getMoodEntriesByDays = async (days: number) => {
     return { data: [], ...returnErrorFromUnknown(error) };
   }
 };
-
-const getIsoDate = (date: Date) => new Date(date).toISOString().slice(0, 10); //"YYYY-MM-DD";

@@ -35,7 +35,7 @@ model User {
 model MoodEntry {
   id        String   @id @default(cuid())
   userId    String
-  day       DateTime // normalized to day
+  day       DateTime
   valence   Int      // pleasantness: e.g. -5 to +5 scale
   arousal   Int      // energy: e.g. -5 to +5 scale
   note      String?
@@ -46,7 +46,7 @@ model MoodEntry {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  @@unique([userId, day]) // one entry per user per day
+  @@unique([userId, day]) 
 }
 
 // NextAuth models (for Prisma adapter)

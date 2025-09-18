@@ -12,6 +12,7 @@ import { routes } from "@/utils/config";
 import { getTodaysMood } from "../../lib/database";
 import ErrorMessage from "@/components/ErrorMessage";
 import { Skeleton } from "@/components/shadcn/skeleton";
+import { getMoodFromValenceArousal } from "../../utils/MoodInsight-utils";
 
 const TodaysEntry = async () => {
   const { entry: todaysEntry, error } = await getTodaysMood();
@@ -35,20 +36,21 @@ const TodaysEntry = async () => {
       </div>
     );
   } else {
+    const valence = todaysEntry.valence;
+    const arousal = todaysEntry.arousal;
     content = (
       <div className="space-y-4">
         <div className="flex items-center gap-4">
           <div
             className="w-12 h-12 rounded-full border"
             style={{
-              backgroundColor: getColor(
-                todaysEntry.valence,
-                todaysEntry.arousal
-              ),
+              backgroundColor: getColor(valence, arousal),
             }}
           />
           <div>
-            <p className="font-medium">You were ... today.</p>
+            <p className="font-medium">
+              You were {getMoodFromValenceArousal(valence, arousal)} today.
+            </p>
             {todaysEntry.note && (
               <p className="text-sm text-muted-foreground">
                 {todaysEntry.note}

@@ -1,4 +1,5 @@
 import { ReadonlyHeaders } from "next/dist/server/web/spec-extension/adapters/headers";
+import { TimezoneInfo } from "./types";
 
 //helper to get  utc, prisma needs utc dates
 export function getUTC(date?: Date): Date {
@@ -30,6 +31,7 @@ export const getColor = (x: number, y: number) => {
   return `rgb(${r}, ${g}, ${b})`;
 };
 
+//helper to get use locale from headers if present
 export async function getUserLocale(
   headers: () => Promise<ReadonlyHeaders>
 ): Promise<string | undefined> {
@@ -41,3 +43,22 @@ export async function getUserLocale(
   const primaryLocale = acceptLanguage.split(",")[0];
   return primaryLocale;
 }
+
+//converts to iso date
+export const getIsoDate = (date: Date) =>
+  new Date(date).toISOString().slice(0, 10); //"YYYY-MM-DD";
+
+//gets start and end of day respecting locality
+export const getStartAndEndOfDay = (timezoneInfo: TimezoneInfo) => {
+  const { timestamp, timezoneOffset } = timezoneInfo;
+
+  const now = new Date(timestamp);
+  const gte = new Date(now);
+  gte.setMinutes(gte.getMinutes() - timezoneOffset);
+  gte.setHours(0, 0, 0, 0);
+
+  const lte = new Date(now);
+  lte.setMinutes(lte.getMinutes() - timezoneOffset);
+  lte.setHours(23, 59, 59, 999);
+  return { gte, lte };
+};
