@@ -3,12 +3,12 @@
 import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import { checkAuth, returnErrorFromUnknown } from "@/utils/helpers";
-import { AddMood, TimezoneInfo } from "../utils/types";
-import { getIsoDate, getStartAndEndOfDay, getUTC } from "../utils/helpers";
+import { AddMood } from "../utils/types";
+import { getIsoDate, getStartAndEndOfToday } from "../utils/helpers";
 import { routes } from "@/utils/config";
 
-//adds mood with current date converted to utc
-export const addMood = async (entry: AddMood, timezoneInfo: TimezoneInfo) => {
+//adds mood with current date or update if already exists
+export const addMood = async (entry: AddMood) => {
   try {
     const user = await checkAuth();
 
@@ -24,7 +24,7 @@ export const addMood = async (entry: AddMood, timezoneInfo: TimezoneInfo) => {
     )
       throw Error("Valence and arousal must be whole numbers between -5 and 5");
 
-    const { gte, lte } = getStartAndEndOfDay(timezoneInfo);
+    const { gte, lte } = getStartAndEndOfToday();
 
     const existing = await prisma.moodEntry.findFirst({
       where: {
@@ -69,10 +69,8 @@ export const getTodaysMood = async () => {
   try {
     const user = await checkAuth();
 
-    const gte = getUTC();
-    const lte = getUTC();
-    lte.setUTCHours(23, 59, 59, 999);
-    gte.setUTCHours(0, 0, 0, 0);
+    const { gte, lte } = getStartAndEndOfToday();
+    console.log(gte, lte);
 
     const entry = await prisma.moodEntry.findFirst({
       where: {
@@ -108,11 +106,8 @@ export const getMoodsByMonth = async (param: {
         ? param.month
         : now.getMonth(); // 0-indexed: Jan = 0
 
-    const startOfMonth = new Date(year, month, 1, 0, 0, 0, 0);
-    const endOfMonth = new Date(year, month + 1, 0, 23, 59, 59, 999);
-
-    const gte = getUTC(startOfMonth);
-    const lte = getUTC(endOfMonth);
+    const gte = new Date(year, month, 1, 0, 0, 0, 0);
+    const lte = new Date(year, month + 1, 0, 23, 59, 59, 999);
 
     // fetch entries for that month
     const entries = await prisma.moodEntry.findMany({
@@ -170,18 +165,15 @@ export const getMoodEntriesByDays = async (days: number) => {
     const user = await checkAuth();
     const now = new Date();
 
-    const startDate = new Date();
-    startDate.setDate(now.getDate() - (days - 1)); // inclusive
-
-    const gte = getUTC(startDate);
-    const lte = getUTC(now);
+    const gte = new Date();
+    gte.setDate(now.getDate() - (days - 1)); // inclusive
 
     const entries = await prisma.moodEntry.findMany({
       where: {
         userId: user.id,
         day: {
           gte,
-          lte,
+          lte: now,
         },
       },
       orderBy: { day: "asc" },
@@ -195,10 +187,10 @@ export const getMoodEntriesByDays = async (days: number) => {
       ])
     );
 
-    // generate full day array
+    // generate full days array
     const chartData = Array.from({ length: days }, (_, i) => {
-      const d = new Date(startDate);
-      d.setDate(startDate.getDate() + i);
+      const d = new Date(gte);
+      d.setDate(gte.getDate() + i);
       const day = getIsoDate(d);
 
       return {

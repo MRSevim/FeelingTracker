@@ -42,20 +42,18 @@ const Title = () => <CardTitle>Mood Tracker</CardTitle>;
 
 function Chart({
   data,
-  locale,
 }: {
   data: {
     day: Date;
     valence?: number;
     arousal?: number;
   }[];
-  locale?: string;
 }) {
   const [timeRange, setTimeRange] = React.useState("7");
   const filteredData = data.slice(-timeRange);
 
   const formatDate = (value: Date) => {
-    return new Date(value).toLocaleDateString(locale);
+    return new Date(value).toDateString();
   };
   return (
     <Card className="flex-2 w-full">

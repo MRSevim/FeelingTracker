@@ -12,13 +12,12 @@ import {
   TooltipTrigger,
 } from "@/components/shadcn/tooltip";
 import { CalendarDays } from "lucide-react";
-import { getColor, getUserLocale } from "../../utils/helpers";
+import { getColor } from "../../utils/helpers";
 import { Skeleton } from "@/components/shadcn/skeleton";
 import { getMoodsByMonth } from "../../lib/database";
 import ErrorMessage from "@/components/ErrorMessage";
 import DatePicker, { DatePickerSkeleton } from "./DatePicker";
 import { DashboardSearchParams } from "../../utils/types";
-import { headers } from "next/headers";
 
 const Calendar = async ({ searchParams }: DashboardSearchParams) => {
   const params = await searchParams;
@@ -58,8 +57,6 @@ const Calendar = async ({ searchParams }: DashboardSearchParams) => {
     };
   });
 
-  const locale = await getUserLocale(headers);
-
   return (
     <Card className="w-full">
       <CardHeader className="flex items-center gap-2 flex flex-col">
@@ -93,7 +90,7 @@ const Calendar = async ({ searchParams }: DashboardSearchParams) => {
                 </TooltipTrigger>
                 <TooltipContent className="text-wrap text-center max-w-[200px]">
                   <p className="text-sm font-medium">
-                    {day.day.toLocaleDateString(locale)}
+                    {day.day.toDateString()}
                   </p>
                   {day.entry ? (
                     <p className="text-xs text-muted mt-1">

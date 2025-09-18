@@ -29,7 +29,7 @@ export const getAvailableMonthsByYear = (
   // convert to nice month names using the actual year
   const convertedMonths = sortedMonths.map((m) => {
     return {
-      string: new Date(year, m).toLocaleString("default", { month: "long" }),
+      string: new Date(year, m).toLocaleString("en-US", { month: "long" }),
       monthNumber: m,
     };
   });
