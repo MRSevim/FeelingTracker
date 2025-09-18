@@ -70,7 +70,6 @@ export const getTodaysMood = async () => {
     const user = await checkAuth();
 
     const { gte, lte } = getStartAndEndOfToday();
-    console.log(gte, lte);
 
     const entry = await prisma.moodEntry.findFirst({
       where: {

@@ -1,10 +1,10 @@
+import About from "@/components/About";
 import Container from "@/components/Container";
-import Settings from "@/features/settings/components/Settings";
 
 export default function Page() {
   return (
     <Container>
-      <Settings />
+      <About />
     </Container>
   );
 }

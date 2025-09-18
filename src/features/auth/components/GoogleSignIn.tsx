@@ -1,13 +1,14 @@
 import { Button } from "@/components/shadcn/button";
 import { signIn } from "../lib/auth";
 import { FcGoogle } from "react-icons/fc";
+import { routes } from "@/utils/config";
 
 export default function GoogleSignIn() {
   return (
     <form
       action={async () => {
         "use server";
-        await signIn("google");
+        await signIn("google", { redirectTo: routes.dashboard });
       }}
     >
       <Button

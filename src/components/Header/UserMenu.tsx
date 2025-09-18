@@ -59,7 +59,7 @@ const UserMenu = async () => {
           </DropdownMenuContent>
         </DropdownMenu>
       ) : (
-        <Link href="/">
+        <Link href={routes.signIn}>
           <Button variant="default" size="sm">
             Sign in
           </Button>

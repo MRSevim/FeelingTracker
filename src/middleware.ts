@@ -10,7 +10,11 @@ export default auth((request) => {
   );
 
   if (!request.auth && requiresAuth) {
-    return NextResponse.redirect(new URL(routes.homepage, request.url));
+    return NextResponse.redirect(new URL(routes.signIn, request.url));
+  }
+
+  if (request.auth && request.nextUrl.pathname.startsWith(routes.signIn)) {
+    return NextResponse.redirect(new URL(routes.dashboard, request.url));
   }
 });
 

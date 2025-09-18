@@ -28,7 +28,7 @@ const TodaysEntry = async () => {
           You have not submitted your mood today.
         </p>
         <Button variant="outline" className="gap-2" asChild>
-          <Link href={routes.homepage}>
+          <Link href={routes.moodEntry}>
             <PlusCircle className="h-4 w-4" />
             Wanna submit?
           </Link>
@@ -59,7 +59,7 @@ const TodaysEntry = async () => {
           </div>
         </div>
         <Button variant="outline" className="gap-2" asChild>
-          <Link href={routes.homepage + "?edit=true"}>
+          <Link href={routes.moodEntry + "?edit=true"}>
             <Edit3 className="h-4 w-4" />
             Wanna change it?
           </Link>

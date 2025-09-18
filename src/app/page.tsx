@@ -1,42 +1,14 @@
 import Container from "@/components/Container";
-import SignIn from "@/features/auth/components/SignIn";
-import { auth } from "@/features/auth/lib/auth";
-import MoodSelector from "@/features/tracker/components/MoodSelector/MoodSelector";
-import { getTodaysMood } from "@/features/tracker/lib/database";
+import { Button } from "@/components/shadcn/button";
 import { routes } from "@/utils/config";
-import { redirect } from "next/navigation";
+import Link from "next/link";
 
-export default async function Home({
-  searchParams,
-}: {
-  searchParams: Promise<{ edit?: string }>;
-}) {
-  const session = await auth();
-  const user = session?.user;
-  const { edit } = await searchParams;
-  let editedEntry;
-  const editing = edit === "true";
-
-  if (user) {
-    const { entry, error } = await getTodaysMood();
-    if (entry && !editing) {
-      redirect(routes.dashboard);
-    }
-    if (editing) {
-      if (!entry || error) {
-        throw error || "Could not get today's mood";
-      }
-      editedEntry = {
-        valence: entry.valence,
-        arousal: entry.arousal,
-        note: entry.note || undefined,
-      };
-    }
-  }
-
+export default async function Home() {
   return (
     <Container className="flex-1 flex flex-col justify-center items-center">
-      {!user ? <SignIn /> : <MoodSelector editedEntry={editedEntry} />}
+      <Button asChild className="mb-30">
+        <Link href={routes.signIn}>Try it out</Link>
+      </Button>
     </Container>
   );
 }

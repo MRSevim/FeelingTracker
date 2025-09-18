@@ -2,7 +2,7 @@ import DeleteAccountButton from "./DeleteAccountButton";
 
 const Settings = () => {
   return (
-    <div className="flex-1 mt-20">
+    <div className="mt-20">
       <DeleteAccountButton />
     </div>
   );
