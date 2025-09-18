@@ -7,6 +7,7 @@ import Calendar, { CalendarSkeleton } from "./Calendar";
 import { DashboardSearchParams } from "../../utils/types";
 import ChartWrapper from "./Charts/ChartWrapper";
 import { ChartSkeleton } from "./Charts/Chart";
+import Insights, { InsightsSkeleton, InsightsWrapper } from "./Insights";
 
 export default function Dashboard({ searchParams }: DashboardSearchParams) {
   return (
@@ -23,9 +24,16 @@ export default function Dashboard({ searchParams }: DashboardSearchParams) {
           </Suspense>
         </TodaysEntryWrapper>
       </div>
-      <Suspense fallback={<ChartSkeleton />}>
-        <ChartWrapper />
-      </Suspense>
+      <div className="flex flex-col gap-8 justify-center items-center flex-2 w-full">
+        <Suspense fallback={<ChartSkeleton />}>
+          <ChartWrapper />
+        </Suspense>
+        <InsightsWrapper>
+          <Suspense fallback={<InsightsSkeleton />}>
+            <Insights />
+          </Suspense>
+        </InsightsWrapper>
+      </div>
     </div>
   );
 }

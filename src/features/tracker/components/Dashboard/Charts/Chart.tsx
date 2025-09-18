@@ -175,7 +175,7 @@ export const ChartSkeleton = () => {
       </CardHeader>
       <CardContent>
         {/* Chart placeholder */}
-        <div className="aspect-auto w-full h-[250px] rounded-md overflow-hidden">
+        <div className="aspect-auto w-full h-[250px] rounded-md">
           <Skeleton className="h-full w-full" />
         </div>
 
