@@ -3,6 +3,7 @@ import { Geist, JetBrains_Mono, Source_Serif_4 } from "next/font/google";
 import "./globals.css";
 import ClientWrapper from "@/lib/ClientWrapper";
 import Header from "@/components/Header/Header";
+import Script from "next/script";
 
 const geistSans = Geist({
   variable: "--font-sans",
@@ -32,6 +33,28 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        {process.env.ENV === "production" && (
+          <>
+            <Script
+              async
+              src={
+                "https://www.googletagmanager.com/gtag/js?id=" +
+                process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS_ID
+              }
+            />
+            <Script id="google-analytics">
+              {` window.dataLayer = window.dataLayer || [];
+            function gtag() {
+            dataLayer.push(arguments);
+            }
+            gtag("js", new Date());
+            
+            gtag("config", "${process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS_ID}");`}
+            </Script>
+          </>
+        )}
+      </head>
       <body
         className={`${geistSans.variable} ${sourceSerif4.variable} ${jetBrainsMono.variable} antialiased flex flex-col min-h-screen`}
       >

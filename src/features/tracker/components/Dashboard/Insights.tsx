@@ -65,7 +65,7 @@ export const InsightsWrapper = ({
 export const InsightsSkeleton = () => {
   return (
     <CardContent>
-      <ul className="flex gap-2 flex-wrap">
+      <ul className="grid gap-2 grid-cols-1 xs:grid-cols-2">
         {Array.from({ length: 3 }).map((_, idx) => (
           <li key={idx} className="flex items-start gap-2 p-2 rounded-md">
             <Skeleton className="w-5 h-5 rounded-full mt-1" />
