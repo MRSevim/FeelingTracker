@@ -10,7 +10,7 @@ const About = () => {
         developed it. However, anyone can create an account and start tracking
         their mood. So feel free to do so and and let me know what you think!
       </p>
-      <h2 className="mt-2 text-xl font-bold">More About Me</h2>
+      <h2 className="mt-2 text-xl font-bold">About Me</h2>
       <p className="mt-2">
         {" "}
         My name is Muhammed Raşid Sevim and I am from Turkey. I developed the

@@ -21,9 +21,9 @@ const jetBrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "FeelingTracker",
+  title: "MoodTracker",
   description:
-    "Track your feelings day to day and see how you reported with charts and calender from your dashboard",
+    "Track your mood day to day and see how you reported with charts and calender from your dashboard",
 };
 
 export default function RootLayout({

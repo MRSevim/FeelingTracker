@@ -14,7 +14,7 @@ export default function Header() {
           {/* Left */}
           <div className="text-2xl font-bold mb-2 sm:mb-0">
             <Link href={routes.homepage} className="cursor-pointer">
-              FeelingTracker
+              MoodTracker
             </Link>
           </div>
 
