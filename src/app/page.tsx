@@ -20,9 +20,9 @@ export default async function Home() {
       </div>
 
       {/* Right side video */}
-      <div className="rounded-2xl overflow-hidden shadow-xl shrink h-auto sm:flex-2">
+      <div className="rounded-2xl overflow-hidden shadow-xl border border-foreground border-2 shrink h-auto sm:flex-2">
         <video
-          src="/screen-capture.webm"
+          src="/MoodTracker.webm"
           autoPlay
           loop
           muted
